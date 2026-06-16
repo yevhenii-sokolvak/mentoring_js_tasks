@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <form action="" class="task-form">
+            <input type="text" placeholder="Enter task">
+            <select name="priority" id="priority">
+                <option value="high">високий</option>
+                <option value="medium">середній</option>
+                <option value="low">низький</option>
+            </select>
+            <select name="status" id="status">
+                <option value="new">нове</option>
+                <option value="inProgresss">в процесі</option>
+                <option value="completed">завершено</option>
+            </select>
+            <button type="submit">Add task</button>
+        </form>
+        <ul class="task-list">
+        </ul>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
