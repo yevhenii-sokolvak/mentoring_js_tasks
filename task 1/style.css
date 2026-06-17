@@ -61,6 +61,19 @@ select, input {
     background-color: #f1f1f1;
 }
 
+.task-item--completed {
+    position: relative;
+    background-color: #d4edda;
+
+    ::after {
+        position: absolute;
+        content: "";
+        inset: calc(50% - 1px) 16px 0;
+        height: 2px;
+        background-color: #28a745;
+    }
+}
+
 .task-item__controls {
     display: flex;
     gap: 16px;

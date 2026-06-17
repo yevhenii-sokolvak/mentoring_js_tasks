@@ -26,18 +26,39 @@ class Task {
     }
 };
 
-let task = new Task("Вивчити Реакт", PRIORITIES.high);
-let task2 = new Task("Завершити проект", PRIORITIES.low, STATUSES.inProgress);
-
 // TASK MANAGER
 
 const TaskManager = {
-    tasks: [task, task2],
+    tasks: [],
+
+    saveTasks: function() {
+        localStorage.setItem("tasks", JSON.stringify(this.tasks));
+    },
+
+    loadTasks: function() {
+        let savedTasks = localStorage.getItem("tasks");
+
+        if (savedTasks) {
+            let parsedTasks = JSON.parse(savedTasks);
+
+            this.tasks = parsedTasks.map(taskData => {
+                let task = new Task(taskData.description, taskData.priority, taskData.status);
+                task.id = taskData.id;
+                return task;
+            });
+        } else {
+            this.tasks = [
+                new Task("Вивчити Реакт", PRIORITIES.high), // TODO: EXAMPLE TASKS, NEED TO REMOVE
+                new Task("Завершити проект", PRIORITIES.low, STATUSES.inProgress) // TODO: EXAMPLE TASKS, NEED TO REMOVE
+            ];
+        }
+    },
 
     updateTaskStatus: function(taskId, newStatus) {
         let task = this.tasks.find(t => t.id === taskId);
         if (task) {
             task.updateStatus(newStatus);
+            this.saveTasks();
             this.renderTasks();
         }
     },
@@ -46,6 +67,7 @@ const TaskManager = {
         let task = this.tasks.find(t => t.id === taskId);
         if (task) {
             task.updatePriority(newPriority);
+            this.saveTasks();
             this.renderTasks();
         }
     },
@@ -53,11 +75,13 @@ const TaskManager = {
     addTask: function(description, priority, status) {
         let newTask = new Task(description, priority, status);
         this.tasks.push(newTask);
+        this.saveTasks();
         this.renderTasks();
     },
 
     deleteTask: function(taskId) {
         this.tasks = this.tasks.filter(t => t.id !== taskId);
+        this.saveTasks();
         this.renderTasks();
     },
 
@@ -68,7 +92,7 @@ const TaskManager = {
 
     tasks.forEach((task, index) => {
         taskList.innerHTML += `
-            <div class="task-item" task-id=${task.id}>
+            <div class="task-item ${task.status === STATUSES.completed ? "task-item--completed" : ""}" task-id=${task.id}>
                 <strong>${task.description}</strong>
                 <div class=task-item__controls>
                     <div>
@@ -90,10 +114,15 @@ const TaskManager = {
             </div>
         `;
     })
+    },
+
+    load: function() {
+        this.loadTasks();
+        this.renderTasks();
     }
 }
 
-TaskManager.renderTasks();
+TaskManager.load();
 
 // FORM HANDLER
 const taskForm = document.querySelector(".task-form");
