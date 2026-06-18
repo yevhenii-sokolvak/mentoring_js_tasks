@@ -8,6 +8,20 @@
 </head>
 <body>
     <div class="container">
+        <div class="task-controls">
+            <select id="filterStatus">
+                <option value="all">Всі статуси</option>
+                <option value="new">Нове</option>
+                <option value="inProgress">В процесі</option>
+                <option value="completed">Завершено</option>
+            </select>
+
+            <select id="sortPriority">
+                <option value="none">Без сортування</option>
+                <option value="highToLow">Пріоритет: спочатку високий</option>
+                <option value="lowToHigh">Пріоритет: спочатку низький</option>
+            </select>
+        </div>
         <form action="" class="task-form">
             <input type="text" placeholder="Введіть опис завдання" name="description">
             <select name="priority" id="priority">

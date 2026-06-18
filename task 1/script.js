@@ -116,6 +116,38 @@ const TaskManager = {
     })
     },
 
+    getFilteredTasks: function(filterStatusSelect) {
+        let tasks = this.tasks,
+            filterValue = filterStatusSelect.value;
+
+        if (filterValue !== "all") {
+            tasks = tasks.filter(task => task.status === STATUSES[filterValue]);
+
+            this.renderTasks(tasks);
+        } else {
+            this.renderTasks(tasks);
+        }
+    },
+
+    getSortedTasks: function(sortPrioritySelect) {
+        let tasks = this.tasks,
+            sortValue = sortPrioritySelect.value;
+
+        let priorityOrder = {
+            [PRIORITIES.high]: 1,
+            [PRIORITIES.medium]: 2,
+            [PRIORITIES.low]: 3
+        };
+
+        if (sortValue === "highToLow") {
+            tasks.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+        } else if (sortValue === "lowToHigh") {
+            tasks.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]);
+        }
+
+        TaskManager.renderTasks(tasks);
+    },
+
     load: function() {
         this.loadTasks();
         this.renderTasks();
@@ -142,3 +174,10 @@ taskForm.addEventListener("submit", function(event) {
 
     TaskManager.renderTasks();
 });
+
+// FILTERS HANDLER
+const filterStatusSelect = document.querySelector("#filterStatus"),
+      sortPrioritySelect = document.querySelector("#sortPriority");
+
+filterStatusSelect.addEventListener("change", TaskManager.getFilteredTasks.bind(TaskManager, filterStatusSelect));
+sortPrioritySelect.addEventListener("change", TaskManager.getSortedTasks.bind(TaskManager, sortPrioritySelect));
