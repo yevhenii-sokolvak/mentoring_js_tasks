@@ -16,6 +16,13 @@
                 <option value="completed">Завершено</option>
             </select>
 
+            <select id="filterPriority">
+                <option value="all">Всі пріоритети</option>
+                <option value="high">Високий</option>
+                <option value="medium">Середній</option>
+                <option value="low">Низький</option>
+            </select>
+
             <select id="sortPriority">
                 <option value="none">Без сортування</option>
                 <option value="highToLow">Пріоритет: спочатку високий</option>
@@ -24,16 +31,18 @@
         </div>
         <form action="" class="task-form">
             <input type="text" placeholder="Введіть опис завдання" name="description">
-            <select name="priority" id="priority">
-                <option value="high">високий</option>
-                <option value="medium">середній</option>
-                <option value="low">низький</option>
-            </select>
-            <select name="status" id="status">
-                <option value="new">нове</option>
-                <option value="inProgresss">в процесі</option>
-                <option value="completed">завершено</option>
-            </select>
+            <div class="task-form__controls">
+                <select name="priority" id="priority">
+                    <option value="high">високий</option>
+                    <option value="medium">середній</option>
+                    <option value="low">низький</option>
+                </select>
+                <select name="status" id="status">
+                    <option value="new">нове</option>
+                    <option value="inProgress">в процесі</option>
+                    <option value="completed">завершено</option>
+                </select>
+            </div>
             <button type="submit">Додати завдання</button>
         </form>
         <ul class="task-list">

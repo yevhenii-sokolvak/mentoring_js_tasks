@@ -20,10 +20,10 @@ button {
     color: white;
     cursor: pointer;
     transition: background-color 0.3s ease;
+}
 
-    &:hover {
-        background-color: #0056b3;
-    }
+button:hover {
+    background-color: #0056b3;
 }
 
 select, input {
@@ -31,10 +31,10 @@ select, input {
     border: 1px solid #ccc;
     border-radius: 4px;
     transition: border-color 0.3s ease;
+}
 
-    &:hover {
-        border-color: #007bff;
-    }
+select, input:hover {
+    border-color: #007bff;
 }
 
 .task-controls {
@@ -47,11 +47,27 @@ select, input {
     margin-bottom: 20px;
 }
 
+.task-controls select {
+    flex: 0 1 150px;
+    min-width: 0;
+}
+
 .task-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #fff;
+}
+
+.task-form__controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-grow: 1;
 }
 
 .task-list {
@@ -63,7 +79,9 @@ select, input {
 
 .task-item {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
     align-items: center;
     padding: 10px;
     border: 1px solid #ccc;
@@ -74,17 +92,19 @@ select, input {
 .task-item--completed {
     position: relative;
     background-color: #d4edda;
+}
 
-    ::after {
-        position: absolute;
-        content: "";
-        inset: calc(50% - 1px) 16px 0;
-        height: 2px;
-        background-color: #28a745;
-    }
+.task-item--completed::after {
+    position: absolute;
+    content: "";
+    inset: calc(50% - 1px) 16px 0;
+    height: 2px;
+    background-color: #28a745;
 }
 
 .task-item__controls {
     display: flex;
     gap: 16px;
+    flex-grow: 1;
+    justify-content: center;
 }

@@ -3,59 +3,65 @@ const STATUSES = {
     inProgress: "в процесі",
     completed: "завершено"
 };
+
 const PRIORITIES = {
-    high: "високий",
-    medium: "середній",
-    low: "низький"
+    high: { name: "високий", value: 1 },
+    medium: { name: "середній", value: 2 },
+    low: { name: "низький", value: 3 }
 };
 
 class Task {
-    constructor(description, priority = PRIORITIES.medium, status = STATUSES.new) {
+    constructor(description, priority = "medium", status = "new") {
         this.id = Date.now() + Math.random();
         this.description = description;
-        this.status = status;
-        this.priority = priority;
+        this.status = status;       // key
+        this.priority = priority;   // key
     }
 
     updateStatus(newStatus) {
         this.status = newStatus;
     }
-    
+
     updatePriority(newPriority) {
         this.priority = newPriority;
     }
-};
-
-// TASK MANAGER
+}
 
 const TaskManager = {
     tasks: [],
 
-    saveTasks: function() {
+    saveTasks() {
         localStorage.setItem("tasks", JSON.stringify(this.tasks));
     },
 
-    loadTasks: function() {
-        let savedTasks = localStorage.getItem("tasks");
+    loadTasks() {
+        const saved = localStorage.getItem("tasks");
 
-        if (savedTasks) {
-            let parsedTasks = JSON.parse(savedTasks);
+        if (saved) {
+            const parsed = JSON.parse(saved);
 
-            this.tasks = parsedTasks.map(taskData => {
-                let task = new Task(taskData.description, taskData.priority, taskData.status);
-                task.id = taskData.id;
+            this.tasks = parsed.map(t => {
+                const task = new Task(t.description, t.priority, t.status);
+                task.id = t.id;
                 return task;
             });
+
         } else {
             this.tasks = [
-                new Task("Вивчити Реакт", PRIORITIES.high), // TODO: EXAMPLE TASKS, NEED TO REMOVE
-                new Task("Завершити проект", PRIORITIES.low, STATUSES.inProgress) // TODO: EXAMPLE TASKS, NEED TO REMOVE
+                new Task("Вивчити Реакт", "high"),
+                new Task("Завершити проект", "low", "inProgress")
             ];
         }
     },
 
-    updateTaskStatus: function(taskId, newStatus) {
-        let task = this.tasks.find(t => t.id === taskId);
+    addTask(description, priority, status) {
+        this.tasks.push(new Task(description, priority, status));
+        this.saveTasks();
+        this.renderTasks();
+    },
+
+    updateTaskStatus(taskId, newStatus) {
+        const task = this.tasks.find(t => t.id === taskId);
         if (task) {
             task.updateStatus(newStatus);
             this.saveTasks();
@@ -63,8 +69,8 @@ const TaskManager = {
         }
     },
 
-    updateTaskPriority: function(taskId, newPriority) {
-        let task = this.tasks.find(t => t.id === taskId);
+    updateTaskPriority(taskId, newPriority) {
+        const task = this.tasks.find(t => t.id === taskId);
         if (task) {
             task.updatePriority(newPriority);
             this.saveTasks();
@@ -72,112 +78,118 @@ const TaskManager = {
         }
     },
 
-    addTask: function(description, priority, status) {
-        let newTask = new Task(description, priority, status);
-        this.tasks.push(newTask);
-        this.saveTasks();
-        this.renderTasks();
-    },
-
-    deleteTask: function(taskId) {
+    deleteTask(taskId) {
         this.tasks = this.tasks.filter(t => t.id !== taskId);
         this.saveTasks();
         this.renderTasks();
     },
 
-    renderTasks: function(tasks = this.tasks) {
-    let taskList = document.querySelector(".task-list");
+    renderTasks(tasks = this.tasks) {
+        const list = document.querySelector(".task-list");
+        list.innerHTML = "";
 
-    taskList.innerHTML = "";
-
-    tasks.forEach((task, index) => {
-        taskList.innerHTML += `
-            <div class="task-item ${task.status === STATUSES.completed ? "task-item--completed" : ""}" task-id=${task.id}>
+        list.innerHTML = tasks.map(task => `
+            <li class="task-item ${task.status === "completed" ? "task-item--completed" : ""}">
                 <strong>${task.description}</strong>
-                <div class=task-item__controls>
+
+                <div class="task-item__controls">
+
                     <div>
-                        Статус: <select onchange="TaskManager.updateTaskStatus(${task.id}, this.value)">
-                            <option value="${STATUSES.new}" ${task.status === STATUSES.new ? "selected" : ""}>${STATUSES.new}</option>
-                            <option value="${STATUSES.inProgress}" ${task.status === STATUSES.inProgress ? "selected" : ""}>${STATUSES.inProgress}</option>
-                            <option value="${STATUSES.completed}" ${task.status === STATUSES.completed ? "selected" : ""}>${STATUSES.completed}</option>
+                        Статус:
+                        <select onchange="TaskManager.updateTaskStatus(${task.id}, this.value)">
+                            ${Object.entries(STATUSES).map(([key, value]) => `
+                                <option value="${key}" ${task.status === key ? "selected" : ""}>
+                                    ${value}
+                                </option>
+                            `).join("")}
                         </select>
                     </div>
+
                     <div>
-                        Пріоритет: <select onchange="TaskManager.updateTaskPriority(${task.id}, this.value)">
-                            <option value="${PRIORITIES.high}" ${task.priority === PRIORITIES.high ? "selected" : ""}>${PRIORITIES.high}</option>
-                            <option value="${PRIORITIES.medium}" ${task.priority === PRIORITIES.medium ? "selected" : ""}>${PRIORITIES.medium}</option>
-                            <option value="${PRIORITIES.low}" ${task.priority === PRIORITIES.low ? "selected" : ""}>${PRIORITIES.low}</option>
+                        Пріоритет:
+                        <select onchange="TaskManager.updateTaskPriority(${task.id}, this.value)">
+                            ${Object.entries(PRIORITIES).map(([key, value]) => `
+                                <option value="${key}" ${task.priority === key ? "selected" : ""}>
+                                    ${value.name}
+                                </option>
+                            `).join("")}
                         </select>
                     </div>
+
                 </div>
+
                 <button onclick="TaskManager.deleteTask(${task.id})">Видалити</button>
-            </div>
-        `;
-    })
+            </li>
+        `).join("");
     },
 
-    getFilteredTasks: function(filterStatusSelect) {
-        let tasks = this.tasks,
-            filterValue = filterStatusSelect.value;
+    getFilteredTasks(select, type) {
+        const value = select.value;
 
-        if (filterValue !== "all") {
-            tasks = tasks.filter(task => task.status === STATUSES[filterValue]);
-
-            this.renderTasks(tasks);
-        } else {
-            this.renderTasks(tasks);
-        }
-    },
-
-    getSortedTasks: function(sortPrioritySelect) {
-        let tasks = this.tasks,
-            sortValue = sortPrioritySelect.value;
-
-        let priorityOrder = {
-            [PRIORITIES.high]: 1,
-            [PRIORITIES.medium]: 2,
-            [PRIORITIES.low]: 3
-        };
-
-        if (sortValue === "highToLow") {
-            tasks.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
-        } else if (sortValue === "lowToHigh") {
-            tasks.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]);
+        if (value === "all") {
+            return this.renderTasks(this.tasks);
         }
 
-        TaskManager.renderTasks(tasks);
+        const filtered = this.tasks.filter(task => task[type] === value);
+        this.renderTasks(filtered);
     },
 
-    load: function() {
+    getSortedTasks(select) {
+        const value = select.value,
+              tasks = [...this.tasks];
+
+        if (value === "highToLow") {
+            tasks.sort((a, b) =>
+                PRIORITIES[a.priority].value - PRIORITIES[b.priority].value
+            );
+        }
+
+        if (value === "lowToHigh") {
+            tasks.sort((a, b) =>
+                PRIORITIES[b.priority].value - PRIORITIES[a.priority].value
+            );
+        }
+
+        this.renderTasks(tasks);
+    },
+
+    load() {
         this.loadTasks();
         this.renderTasks();
     }
-}
+};
 
 TaskManager.load();
 
-// FORM HANDLER
+/* FORM */
 const taskForm = document.querySelector(".task-form");
 
-taskForm.addEventListener("submit", function(event) {
-    event.preventDefault();
+taskForm.addEventListener("submit", e => {
+    e.preventDefault();
 
-    let description = taskForm.querySelector("input[name='description']").value.trim(),
-        priority = PRIORITIES[taskForm.querySelector("select[name='priority']").value],
-        status = STATUSES[taskForm.querySelector("select[name='status']").value];
+    const description = taskForm.querySelector("input[name='description']").value.trim(),
+          priority = taskForm.querySelector("select[name='priority']").value,
+          status = taskForm.querySelector("select[name='status']").value;
 
-    if (!description) {
-        return;
-    }
+    if (!description) return;
 
     TaskManager.addTask(description, priority, status);
-
-    TaskManager.renderTasks();
+    taskForm.reset();
 });
 
-// FILTERS HANDLER
-const filterStatusSelect = document.querySelector("#filterStatus"),
-      sortPrioritySelect = document.querySelector("#sortPriority");
+/* FILTERS */
+const filterStatus = document.querySelector("#filterStatus"),
+      filterPriority = document.querySelector("#filterPriority"),
+      sortPriority = document.querySelector("#sortPriority");
 
-filterStatusSelect.addEventListener("change", TaskManager.getFilteredTasks.bind(TaskManager, filterStatusSelect));
-sortPrioritySelect.addEventListener("change", TaskManager.getSortedTasks.bind(TaskManager, sortPrioritySelect));
+filterStatus.addEventListener("change", () =>
+    TaskManager.getFilteredTasks(filterStatus, "status")
+);
+
+filterPriority.addEventListener("change", () =>
+    TaskManager.getFilteredTasks(filterPriority, "priority")
+);
+
+sortPriority.addEventListener("change", () =>
+    TaskManager.getSortedTasks(sortPriority)
+);
