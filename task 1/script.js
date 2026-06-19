@@ -12,7 +12,7 @@ const PRIORITIES = {
 
 class Task {
     constructor(description, priority = "medium", status = "new") {
-        this.id = Date.now() + Math.random();
+        this.id = crypto.randomUUID();
         this.description = description;
         this.status = status;       // key
         this.priority = priority;   // key
@@ -54,18 +54,105 @@ const TaskManager = {
         }
     },
 
-    addTask(description, priority, status) {
-        this.tasks.push(new Task(description, priority, status));
+    refresh() {
         this.saveTasks();
         this.renderTasks();
+    },
+
+    createStatusSelect(task) {
+        const select = document.createElement("select");
+
+        Object.entries(STATUSES).forEach(([key, value]) => {
+            const option = document.createElement("option");
+
+            option.value = key;
+            option.textContent = value;
+            option.selected = task.status === key;
+
+            select.append(option);
+        });
+
+        select.addEventListener("change", e => {
+            this.updateTaskStatus(task.id, e.target.value);
+        });
+
+        return select;
+    },
+
+    createPrioritySelect(task) {
+        const select = document.createElement("select");
+
+        Object.entries(PRIORITIES).forEach(([key, value]) => {
+            const option = document.createElement("option");
+
+            option.value = key;
+            option.textContent = value.name;
+            option.selected = task.priority === key;
+
+            select.append(option);
+        });
+
+        select.addEventListener("change", e => {
+            this.updateTaskPriority(task.id, e.target.value);
+        });
+
+        return select;
+    },
+
+    createTaskElement(task) {
+        const li = document.createElement("li");
+
+        li.className = `task-item ${
+            task.status === "completed"
+                ? "task-item--completed"
+                : ""
+        }`;
+
+        const title = document.createElement("strong");
+        title.textContent = task.description;
+
+        const controls = document.createElement("div");
+        controls.className = "task-item__controls";
+
+        const statusWrapper = document.createElement("div");
+        statusWrapper.append("Статус: ");
+        statusWrapper.append(this.createStatusSelect(task));
+
+        const priorityWrapper = document.createElement("div");
+        priorityWrapper.append("Пріоритет: ");
+        priorityWrapper.append(this.createPrioritySelect(task));
+
+        controls.append(
+            statusWrapper,
+            priorityWrapper
+        );
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Видалити";
+
+        deleteBtn.addEventListener("click", () => {
+            this.deleteTask(task.id);
+        });
+
+        li.append(
+            title,
+            controls,
+            deleteBtn
+        );
+
+        return li;
+    },
+
+    addTask(description, priority, status) {
+        this.tasks.push(new Task(description, priority, status));
+        this.refresh();
     },
 
     updateTaskStatus(taskId, newStatus) {
         const task = this.tasks.find(t => t.id === taskId);
         if (task) {
             task.updateStatus(newStatus);
-            this.saveTasks();
-            this.renderTasks();
+            this.refresh();
         }
     },
 
@@ -73,54 +160,24 @@ const TaskManager = {
         const task = this.tasks.find(t => t.id === taskId);
         if (task) {
             task.updatePriority(newPriority);
-            this.saveTasks();
-            this.renderTasks();
+            this.refresh();
         }
     },
 
     deleteTask(taskId) {
         this.tasks = this.tasks.filter(t => t.id !== taskId);
-        this.saveTasks();
-        this.renderTasks();
+        this.refresh();
     },
 
     renderTasks(tasks = this.tasks) {
         const list = document.querySelector(".task-list");
-        list.innerHTML = "";
+        list.textContent = "";
 
-        list.innerHTML = tasks.map(task => `
-            <li class="task-item ${task.status === "completed" ? "task-item--completed" : ""}">
-                <strong>${task.description}</strong>
-
-                <div class="task-item__controls">
-
-                    <div>
-                        Статус:
-                        <select onchange="TaskManager.updateTaskStatus(${task.id}, this.value)">
-                            ${Object.entries(STATUSES).map(([key, value]) => `
-                                <option value="${key}" ${task.status === key ? "selected" : ""}>
-                                    ${value}
-                                </option>
-                            `).join("")}
-                        </select>
-                    </div>
-
-                    <div>
-                        Пріоритет:
-                        <select onchange="TaskManager.updateTaskPriority(${task.id}, this.value)">
-                            ${Object.entries(PRIORITIES).map(([key, value]) => `
-                                <option value="${key}" ${task.priority === key ? "selected" : ""}>
-                                    ${value.name}
-                                </option>
-                            `).join("")}
-                        </select>
-                    </div>
-
-                </div>
-
-                <button onclick="TaskManager.deleteTask(${task.id})">Видалити</button>
-            </li>
-        `).join("");
+        tasks.forEach(task => {
+            list.append(
+                this.createTaskElement(task)
+            );
+        });
     },
 
     getFilteredTasks(select, type) {
