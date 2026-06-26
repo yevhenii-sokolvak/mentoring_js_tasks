@@ -3,6 +3,7 @@ const UA_MONTHS_GENITIVE = ['січня','лютого','березня','кві
 
 class Entry {
     constructor(amount, category, date, type) {
+        // конструктор не валідує дані, валідація лише в updateAmount/Category/Date/Type
         this.id = crypto.randomUUID();
         this.amount = amount;
         this.category = category;
@@ -49,6 +50,7 @@ const FinanceManager = {
     },
 
     addTransaction(amount, category, date, type) {
+        // сирі дані йдуть напряму в Entry, без валідації на цьому рівні
         const entry = new Entry(amount, category, date, type);
         this.transactions.push(entry);
     },
@@ -57,6 +59,7 @@ const FinanceManager = {
         const entry = this.transactions.find(t => t.id === id);
         if (!entry) throw new Error(`Транзакцію з id=${id} не знайдено.`);
 
+        // не атомарно: якщо валідація впаде на середині, частина полів уже зміниться
         entry
             .updateAmount(amount)
             .updateCategory(category)
@@ -158,6 +161,7 @@ const FinanceManager = {
         li.classList.add('finance-records__item--editing');
 
         const date    = new Date(transaction.date);
+        // toISOString() переводить у UTC, у крайніх часових поясах можливий зсув на день
         const isoDate = date.toISOString().split('T')[0];
 
         const form = document.createElement('div');
