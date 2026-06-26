@@ -9,6 +9,7 @@
 <body>
     <div class="container">
         <h1>Облік доходів і витрат</h1>
+        <h2>Поточний баланс: <span id="balance">0</span></h2>
         <form class="finance-form">
             <input type="number" id="amount" placeholder="Сума" required>
             <input type="text" id="category" placeholder="Категорія" required>
@@ -21,6 +22,28 @@
         </form>
         <h2>Записи</h2>
         <ul class="finance-records" id="records"></ul>
+        <h2 class="section__title">Звіти</h2>
+        <div class="report-controls">
+            <div class="report-controls__group">
+                <label class="report-controls__label">За місяцем</label>
+                <div class="report-controls__row">
+                    <select id="report-month">
+                        <option value="">— оберіть місяць —</option>
+                    </select>
+                    <button id="btn-month-report" class="btn btn--secondary">Показати</button>
+                </div>
+            </div>
+            <div class="report-controls__group">
+                <label class="report-controls__label">За категорією</label>
+                <div class="report-controls__row">
+                    <select id="report-category">
+                        <option value="">— оберіть категорію —</option>
+                    </select>
+                    <button id="btn-category-report" class="btn btn--secondary">Показати</button>
+                </div>
+            </div>
+        </div>
+        <div id="report-container"></div>
     </div>
     <script src="script.js"></script>
 </body>

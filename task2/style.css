@@ -48,3 +48,29 @@ select, input:hover {
     padding: 8px;
     border-bottom: 1px solid #ccc;
 }
+
+.report-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.report__summary {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.report__table {
+    border-collapse: collapse;
+}
+
+.report__table th, .report__table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+.edit-form__error {
+    color: red;
+}
