@@ -87,6 +87,20 @@ select, input:hover {
     gap: 8px;
 }
 
+.edit-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.edit-form__buttons {
+    display: flex;
+    gap: 5px;
+}
+
 @media screen and (min-width: 768px) {
     .finance-records__item {
         justify-content: space-between;

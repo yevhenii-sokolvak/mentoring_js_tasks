@@ -114,7 +114,7 @@ const FinanceManager = {
 
     createTransactionElement(transaction) {
         const li = document.createElement('li');
-        li.classList.add('finance-records__item', `finance-records__item--${transaction.type}`);
+        li.classList.add('finance-records__item');
         li.dataset.id = transaction.id;
 
         const txDate        = transaction.date;
@@ -129,11 +129,11 @@ const FinanceManager = {
         spanCat.textContent = transaction.category;
 
         const spanType = document.createElement('span');
-        spanType.classList.add('finance-records__type', `finance-records__type--${transaction.type}`);
+        spanType.classList.add('finance-records__type');
         spanType.textContent = transaction.type;
 
         const spanAmt = document.createElement('span');
-        spanAmt.classList.add('finance-records__amount', `finance-records__amount--${transaction.type}`);
+        spanAmt.classList.add('finance-records__amount');
         spanAmt.textContent = `${transaction.type === 'дохід' ? '+' : '−'}${transaction.amount.toFixed(2)} ₴`;
 
         const actions = document.createElement('div');
@@ -208,11 +208,9 @@ const FinanceManager = {
         });
 
         const btnSave = document.createElement('button');
-        btnSave.classList.add('btn', 'btn--primary', 'btn--sm');
         btnSave.textContent = 'Зберегти';
 
         const btnCancel = document.createElement('button');
-        btnCancel.classList.add('btn', 'btn--ghost', 'btn--sm');
         btnCancel.textContent = 'Скасувати';
 
         const errorMsg = document.createElement('p');
