@@ -4,10 +4,10 @@ const UA_MONTHS_GENITIVE = ['січня','лютого','березня','кві
 class Entry {
     constructor(amount, category, date, type) {
         this.id = crypto.randomUUID();
-        this.amount = amount;
-        this.category = category;
-        this.date = date;
-        this.type = type;
+        this.updateAmount(amount)
+            .updateCategory(category)
+            .updateDate(date)
+            .updateType(type);
     }
 
     updateAmount(newAmount) {
@@ -25,7 +25,7 @@ class Entry {
     }
 
     updateDate(newDate) {
-        const date = new Date(newDate);
+        const date = newDate instanceof Date ? newDate : new Date(newDate);
         if (isNaN(date)) throw new Error('Некоректна дата.');
         this.date = date;
         return this;
@@ -49,19 +49,34 @@ const FinanceManager = {
     },
 
     addTransaction(amount, category, date, type) {
-        const entry = new Entry(amount, category, date, type);
-        this.transactions.push(entry);
+        this.transactions.push(new Entry(amount, category, date, type));
     },
 
     updateTransaction(id, { amount, category, date, type }) {
         const entry = this.transactions.find(t => t.id === id);
         if (!entry) throw new Error(`Транзакцію з id=${id} не знайдено.`);
 
-        entry
-            .updateAmount(amount)
-            .updateCategory(category)
-            .updateDate(date)
-            .updateType(type);
+        const validAmount = (() => { 
+            const n = Number(amount);   
+            if (!n || n <= 0) throw new Error('Сума повинна бути додатним числом.'); return n; 
+        })();
+        const validCategory = (() => { 
+            const c = String(category || '').trim(); 
+            if (!c) throw new Error('Категорія не може бути порожньою.');  return c; 
+        })();
+        const validDate = (() => { 
+            const d = new Date(date);   
+            if (isNaN(d)) throw new Error('Некоректна дата.'); return d; 
+        })();
+        const validType = (() => { 
+            const t = String(type || '').trim().toLowerCase(); 
+            if (!['дохід','витрата'].includes(t)) throw new Error('Тип: "дохід" або "витрата".'); return t; 
+        })();
+
+        entry.amount   = validAmount;
+        entry.category = validCategory;
+        entry.date     = validDate;
+        entry.type     = validType;
 
         return entry;
     },
@@ -77,7 +92,7 @@ const FinanceManager = {
 
     renderBalance() {
         const el = document.querySelector('#balance');
-        el.textContent  = this.balance.toFixed(2) + ' ₴';
+        el.textContent = this.balance.toFixed(2) + ' ₴';
         el.classList.remove('balance--positive', 'balance--negative');
         el.classList.add(this.balance >= 0 ? 'balance--positive' : 'balance--negative');
     },
@@ -102,8 +117,8 @@ const FinanceManager = {
         li.classList.add('finance-records__item', `finance-records__item--${transaction.type}`);
         li.dataset.id = transaction.id;
 
-        const date          = new Date(transaction.date);
-        const formattedDate = `${date.getDate()} ${UA_MONTHS_GENITIVE[date.getMonth()]} ${date.getFullYear()}`;
+        const txDate        = transaction.date;
+        const formattedDate = `${txDate.getDate()} ${UA_MONTHS_GENITIVE[txDate.getMonth()]} ${txDate.getFullYear()}`;
 
         const spanDate = document.createElement('span');
         spanDate.classList.add('finance-records__date');
@@ -126,7 +141,7 @@ const FinanceManager = {
 
         const btnEdit = document.createElement('button');
         btnEdit.classList.add('btn-icon', 'btn-icon--edit');
-        btnEdit.title     = 'Редагувати';
+        btnEdit.title       = 'Редагувати';
         btnEdit.textContent = '✏️';
         btnEdit.addEventListener('click', () => {
             const current = this.transactions.find(t => t.id === transaction.id);
@@ -135,7 +150,7 @@ const FinanceManager = {
 
         const btnDelete = document.createElement('button');
         btnDelete.classList.add('btn-icon', 'btn-icon--delete');
-        btnDelete.title     = 'Видалити';
+        btnDelete.title       = 'Видалити';
         btnDelete.textContent = '🗑️';
         btnDelete.addEventListener('click', () => {
             if (!confirm('Видалити транзакцію?')) return;
@@ -157,25 +172,25 @@ const FinanceManager = {
 
         li.classList.add('finance-records__item--editing');
 
-        const date    = new Date(transaction.date);
-        const isoDate = date.toISOString().split('T')[0];
+        const txDate  = transaction.date;
+        const isoDate = `${txDate.getFullYear()}-${String(txDate.getMonth() + 1).padStart(2, '0')}-${String(txDate.getDate()).padStart(2, '0')}`;
 
         const form = document.createElement('div');
         form.classList.add('edit-form');
 
         const inputAmount = document.createElement('input');
-        inputAmount.type  = 'number';
-        inputAmount.value = transaction.amount;
-        inputAmount.min   = '0.01';
-        inputAmount.step  = '0.01';
-        inputAmount.classList.add('edit-form__input');
+        inputAmount.type        = 'number';
+        inputAmount.value       = transaction.amount;
+        inputAmount.min         = '0.01';
+        inputAmount.step        = '0.01';
         inputAmount.placeholder = 'Сума';
+        inputAmount.classList.add('edit-form__input');
 
         const inputCategory = document.createElement('input');
         inputCategory.type        = 'text';
         inputCategory.value       = transaction.category;
-        inputCategory.classList.add('edit-form__input');
         inputCategory.placeholder = 'Категорія';
+        inputCategory.classList.add('edit-form__input');
 
         const inputDate = document.createElement('input');
         inputDate.type  = 'date';
@@ -185,8 +200,8 @@ const FinanceManager = {
         const selectType = document.createElement('select');
         selectType.classList.add('edit-form__input');
         ['дохід', 'витрата'].forEach(val => {
-            const opt   = document.createElement('option');
-            opt.value   = val;
+            const opt = document.createElement('option');
+            opt.value = val;
             opt.textContent = val.charAt(0).toUpperCase() + val.slice(1);
             if (val === transaction.type) opt.selected = true;
             selectType.append(opt);
@@ -211,7 +226,6 @@ const FinanceManager = {
                     date:     inputDate.value,
                     type:     selectType.value,
                 });
-
                 this.render();
                 this.populateReportSelects();
             } catch (err) {
@@ -229,15 +243,13 @@ const FinanceManager = {
         btnGroup.append(btnSave, btnCancel);
 
         form.append(inputAmount, inputCategory, inputDate, selectType, btnGroup, errorMsg);
-
         li.after(form);
     },
 
     getAvailableMonths() {
         const months = new Set();
         this.transactions.forEach(t => {
-            const d = new Date(t.date);
-            months.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+            months.add(`${t.date.getFullYear()}-${String(t.date.getMonth() + 1).padStart(2, '0')}`);
         });
         return [...months].sort().reverse();
     },
@@ -248,10 +260,9 @@ const FinanceManager = {
 
     generateMonthReport(yearMonth) {
         const [year, month] = yearMonth.split('-').map(Number);
-        const filtered = this.transactions.filter(t => {
-            const d = new Date(t.date);
-            return d.getFullYear() === year && d.getMonth() + 1 === month;
-        });
+        const filtered = this.transactions.filter(t =>
+            t.date.getFullYear() === year && t.date.getMonth() + 1 === month
+        );
         return this._buildReport(filtered, `${UA_MONTHS[month - 1]} ${year}`);
     },
 
@@ -265,7 +276,7 @@ const FinanceManager = {
               totalExpense = transactions.filter(t => t.type === 'витрата').reduce((s, t) => s + t.amount, 0),
               balance      = totalIncome - totalExpense,
               byCategory = {};
-
+        
         transactions.forEach(t => {
             if (!byCategory[t.category]) byCategory[t.category] = { дохід: 0, витрата: 0 };
             byCategory[t.category][t.type] += t.amount;
@@ -289,18 +300,31 @@ const FinanceManager = {
         const reportDiv = document.createElement('div');
         reportDiv.classList.add('report');
 
+        reportDiv.append(
+            this._createReportTitle(report.title),
+            this._createReportSummary(report),
+            this._createReportTable(report.byCategory),
+            this._createReportCount(report.transactions.length)
+        );
+
+        container.append(reportDiv);
+    },
+
+    _createReportTitle(titleText) {
         const title = document.createElement('h3');
         title.classList.add('report__title');
-        title.textContent = report.title;
-        reportDiv.append(title);
+        title.textContent = titleText;
+        return title;
+    },
 
+    _createReportSummary({ totalIncome, totalExpense, balance }) {
         const summary = document.createElement('div');
         summary.classList.add('report__summary');
 
         const cardsData = [
-            { mod: 'income',  label: 'Доходи',   value: `+${report.totalIncome.toFixed(2)} ₴` },
-            { mod: 'expense', label: 'Витрати',   value: `−${report.totalExpense.toFixed(2)} ₴` },
-            { mod: 'balance', label: 'Результат', value: `${report.balance >= 0 ? '+' : '−'}${Math.abs(report.balance).toFixed(2)} ₴`, extra: report.balance >= 0 ? 'positive' : 'negative' },
+            { mod: 'income',  label: 'Доходи',   value: `+${totalIncome.toFixed(2)} ₴` },
+            { mod: 'expense', label: 'Витрати',   value: `−${totalExpense.toFixed(2)} ₴` },
+            { mod: 'balance', label: 'Результат', value: `${balance >= 0 ? '+' : '−'}${Math.abs(balance).toFixed(2)} ₴`, extra: balance >= 0 ? 'positive' : 'negative' },
         ];
 
         cardsData.forEach(({ mod, label, value, extra }) => {
@@ -320,8 +344,10 @@ const FinanceManager = {
             summary.append(card);
         });
 
-        reportDiv.append(summary);
+        return summary;
+    },
 
+    _createReportTable(byCategory) {
         const table = document.createElement('table');
         table.classList.add('report__table');
 
@@ -335,10 +361,9 @@ const FinanceManager = {
         thead.append(headerRow);
 
         const tbody = document.createElement('tbody');
-        Object.entries(report.byCategory).forEach(([cat, vals]) => {
+        Object.entries(byCategory).forEach(([cat, vals]) => {
             const tr = document.createElement('tr'),
-                  tdCat = document.createElement('td');
-
+            tdCat = document.createElement('td');
             tdCat.textContent = cat;
 
             const tdIncome = document.createElement('td');
@@ -354,25 +379,24 @@ const FinanceManager = {
         });
 
         table.append(thead, tbody);
-        reportDiv.append(table);
+        return table;
+    },
 
+    _createReportCount(total) {
         const count = document.createElement('p');
         count.classList.add('report__count');
         count.textContent = 'Всього записів: ';
         const strong = document.createElement('strong');
-        strong.textContent = report.transactions.length;
+        strong.textContent = total;
         count.append(strong);
-
-        reportDiv.append(count);
-        container.append(reportDiv);
+        return count;
     },
 
     populateReportSelects() {
         const monthSelect    = document.querySelector('#report-month'),
-            categorySelect = document.querySelector('#report-category');
+              categorySelect = document.querySelector('#report-category');
 
         monthSelect.textContent = '';
-
         const defaultMonth = document.createElement('option');
         defaultMonth.value       = '';
         defaultMonth.textContent = '— оберіть місяць —';
@@ -387,7 +411,6 @@ const FinanceManager = {
         });
 
         categorySelect.textContent = '';
-
         const defaultCat = document.createElement('option');
         defaultCat.value       = '';
         defaultCat.textContent = '— оберіть категорію —';
@@ -418,11 +441,11 @@ document.querySelector('.finance-form').addEventListener('submit', (event) => {
 
     const amount   = parseFloat(document.querySelector('#amount').value),
           category = document.querySelector('#category').value,
-          date     = new Date(document.querySelector('#date').value),
+          rawDate  = document.querySelector('#date').value,
           type     = document.querySelector('#type').value;
 
     try {
-        FinanceManager.addTransaction(amount, category, date, type);
+        FinanceManager.addTransaction(amount, category, rawDate, type);
         FinanceManager.render();
         event.target.reset();
         document.querySelector('#report-container').textContent = '';
