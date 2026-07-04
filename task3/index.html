@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <title>JS Слайдер</title>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="slider-header">
+    <h1>Слайдер</h1>
+  </div>
+
+  <!-- Main slider -->
+  <div class="slider-shell" id="slider">
+
+    <!-- Track -->
+    <div class="slider-track" id="sliderTrack"></div>
+
+    <!-- Nav buttons -->
+    <button class="btn-nav btn-prev" id="btnPrev">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="btn-nav btn-next" id="btnNext">
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+  <!-- Dots -->
+  <div class="dots" id="dotsContainer"></div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
