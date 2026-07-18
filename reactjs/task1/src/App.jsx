@@ -2,7 +2,7 @@ import Task from './components/Task';
 
 function App() {
   return (
-    <div>
+    <div className="max-w-xl mx-auto mt-10 space-y-3 px-4">
       <Task
         title="Вивчити пропси"
         description="Розібратись, як передавати дані у компоненти"
