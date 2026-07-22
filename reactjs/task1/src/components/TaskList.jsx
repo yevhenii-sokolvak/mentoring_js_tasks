@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import Task from './Task';
+import TaskAddForm from './TaskAddForm';
 
 function TaskList() {
   const [tasks, setTasks] = useState([
@@ -23,8 +24,14 @@ function TaskList() {
     );
   };
 
+  const handleAddTask = (newTask) => {
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+  };
+
   return (
     <div className="max-w-xl mx-auto mt-10 space-y-3 px-4">
+      <TaskAddForm onAddTask={handleAddTask} />
+
       {tasks.map((task, index) => (
         <Task
           key={index}
