@@ -1,4 +1,4 @@
-import Note from '../components/Note'
+import NotesManager from '../components/NotesManager'
 import Header from '../components/Header'
 
 
@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="container mx-auto p-4">
       <Header />
-      <Note />
+      <NotesManager />
     </div>
   )
 }
