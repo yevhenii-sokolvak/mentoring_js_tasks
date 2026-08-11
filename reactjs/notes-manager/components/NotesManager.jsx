@@ -1,11 +1,11 @@
 import NoteList from './NoteList';
 import NoteForm from './NoteForm';
 
-function NotesManager() {
+function NotesManager({ notes }) {
     return (
         <div>
             <NoteForm />
-            <NoteList />
+            <NoteList notes={notes} />
         </div>
     )
 }
