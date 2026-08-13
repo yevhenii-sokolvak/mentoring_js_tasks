@@ -1,11 +1,46 @@
-function NoteForm() {
+import { useState } from 'react';
+
+function NoteForm({ onAddNote }) {
+    const [newTitle, setNewTitle] = useState('');
+    const [newContent, setNewContent] = useState('');
+    const [newCategory, setNewCategory] = useState('personal');
+
+const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!newTitle.trim()) return;
+
+    onAddNote({
+        id: crypto.randomUUID(),
+        title: newTitle,
+        content: newContent,
+        category: newCategory,
+    });
+};
+
     return (
         <div className="mb-4">
             Add new note
-            <form action="" className="flex flex-col gap-2 border border-gray-300 p-4 rounded">
-                <input type="text" className="border border-gray-300 p-2 rounded" id="note-name" placeholder="Enter note name..." required />
-                <textarea className="border border-gray-300 p-2 rounded" id="note-content" placeholder="Enter note content..."></textarea>
-                <select className="border border-gray-300 p-2 rounded" id="note-category">
+            <form 
+                onSubmit={handleSubmit} 
+                className="flex flex-col gap-2 border border-gray-300 p-4 rounded"
+            >
+                <input 
+                    type="text" 
+                    className="border border-gray-300 p-2 rounded" id="note-name" placeholder="Enter note name..." required 
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                />
+                <textarea 
+                    className="border border-gray-300 p-2 rounded" id="note-content" placeholder="Enter note content..." 
+                    value={newContent}
+                    onChange={(e) => setNewContent(e.target.value)}
+                ></textarea>
+                <select 
+                    className="border border-gray-300 p-2 rounded" id="note-category"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                >
                     <option value="personal">Personal</option>
                     <option value="work">Work</option>
                     <option value="other">Other</option>

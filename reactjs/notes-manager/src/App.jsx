@@ -1,10 +1,11 @@
+import {useState} from 'react';
 import NotesManager from '../components/NotesManager'
 import Header from '../components/Header'
 
 
 function App() {
 
-  const notes = [
+  const [notes, setNotes] = useState([
     {
       id: crypto.randomUUID(),
       title: 'First Note',
@@ -17,12 +18,16 @@ function App() {
       content: 'This is the content of the second note.',
       category: 'Category 2',
     },
-  ]
+  ]);
+
+  const handleAddNote = (newNote) => {
+    setNotes((prevNotes) => [...prevNotes, newNote]);
+  }
 
   return (
     <div className="container mx-auto p-4">
       <Header />
-      <NotesManager notes={notes} />
+      <NotesManager notes={notes} onAddNote={handleAddNote} />
     </div>
   )
 }
