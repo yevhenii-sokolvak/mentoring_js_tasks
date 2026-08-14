@@ -24,10 +24,18 @@ function App() {
     setNotes((prevNotes) => [...prevNotes, newNote]);
   }
 
+  const handleDeleteNote = (noteId) => {
+    setNotes((prevNotes) => prevNotes.filter(note => note.id !== noteId));
+  }
+
+  const handleEditNote = (noteId, updatedNote) => {
+    setNotes((prevNotes) => prevNotes.map(note => note.id === noteId ? updatedNote : note));
+  }
+
   return (
     <div className="container mx-auto p-4">
       <Header />
-      <NotesManager notes={notes} onAddNote={handleAddNote} />
+      <NotesManager notes={notes} onAddNote={handleAddNote} onDeleteNote={handleDeleteNote} onEditNote={handleEditNote} />
     </div>
   )
 }

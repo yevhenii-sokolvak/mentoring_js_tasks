@@ -5,18 +5,18 @@ function NoteForm({ onAddNote }) {
     const [newContent, setNewContent] = useState('');
     const [newCategory, setNewCategory] = useState('personal');
 
-const handleSubmit = (e) => {
-    e.preventDefault();
+    const handleSubmit = (e) => {
+        e.preventDefault();
 
-    if (!newTitle.trim()) return;
+        if (!newTitle.trim()) return;
 
-    onAddNote({
-        id: crypto.randomUUID(),
-        title: newTitle,
-        content: newContent,
-        category: newCategory,
-    });
-};
+        onAddNote({
+            id: crypto.randomUUID(),
+            title: newTitle,
+            content: newContent,
+            category: newCategory,
+        });
+    };
 
     return (
         <div className="mb-4">
