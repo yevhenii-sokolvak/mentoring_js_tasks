@@ -1,6 +1,6 @@
 import FilterPanel from './FilterPanel'
 
-function Header() {
+function Header({ onSearch }) {
     return(
         <header className="flex flex-col mb-4 bg-green-200 p-4 rounded">
             <div className="flex flex-col justify-between items-center gap-2 md:flex-row">
@@ -11,6 +11,7 @@ function Header() {
                         type="text" 
                         id="search" 
                         name="search"
+                        onChange={(e) => onSearch(e.target.value)}
                         className="border border-gray-300 rounded px-2 py-1 bg-white" 
                         placeholder="Search..." />
                 </label>

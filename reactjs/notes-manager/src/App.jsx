@@ -19,6 +19,7 @@ function App() {
       category: 'Category 2',
     },
   ]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleAddNote = (newNote) => {
     setNotes((prevNotes) => [...prevNotes, newNote]);
@@ -32,10 +33,18 @@ function App() {
     setNotes((prevNotes) => prevNotes.map(note => note.id === noteId ? updatedNote : note));
   }
 
+  const handleSearch = (searchTerm) => {
+    setSearchTerm(searchTerm);
+  }
+
+  const filteredNotes = notes.filter((note) =>
+    note.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="container mx-auto p-4">
-      <Header />
-      <NotesManager notes={notes} onAddNote={handleAddNote} onDeleteNote={handleDeleteNote} onEditNote={handleEditNote} />
+      <Header onSearch={handleSearch} />
+      <NotesManager notes={filteredNotes} onAddNote={handleAddNote} onDeleteNote={handleDeleteNote} onEditNote={handleEditNote} />
     </div>
   )
 }
