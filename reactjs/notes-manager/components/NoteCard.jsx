@@ -22,6 +22,7 @@ function NoteCard({ note, onDeleteNote, onEditNote }) {
                     <input
                         type="text"
                         value={note.title}
+                        className="text-lg font-bold mb-2 border border-gray-300 p-1 rounded"
                         onChange={(e) => onEditNote(note.id, { ...note, title: e.target.value })}
                     />
                 </div>
@@ -34,6 +35,7 @@ function NoteCard({ note, onDeleteNote, onEditNote }) {
                     <input
                         type="text"
                         value={note.content}
+                        className="mb-2 border border-gray-300 p-1 rounded"
                         onChange={(e) => onEditNote(note.id, { ...note, content: e.target.value })}
                     />
                 </div>
@@ -45,6 +47,7 @@ function NoteCard({ note, onDeleteNote, onEditNote }) {
                 <div className="mb-2">
                     <select
                         value={note.category}
+                        className="bg-gray-200 text-gray-800 text-xs font-semibold px-2 py-1 rounded"
                         onChange={(e) => onEditNote(note.id, { ...note, category: e.target.value })}
                     >
                         <option value="personal">Personal</option>
