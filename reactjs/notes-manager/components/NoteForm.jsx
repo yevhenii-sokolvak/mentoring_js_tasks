@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { CATEGORIES } from '../src/constants/CONSTANTS';
 
 function NoteForm({ onAddNote }) {
     const [newTitle, setNewTitle] = useState('');
@@ -41,9 +42,11 @@ function NoteForm({ onAddNote }) {
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
                 >
-                    <option value="personal">Personal</option>
-                    <option value="work">Work</option>
-                    <option value="other">Other</option>
+                    {CATEGORIES.map((category) => (
+                        <option key={category} value={category}>
+                            {category}
+                        </option>
+                    ))}
                 </select>
                 <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 cursor-pointer">
                     Add Note

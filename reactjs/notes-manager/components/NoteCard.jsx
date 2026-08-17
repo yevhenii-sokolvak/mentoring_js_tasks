@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import { CATEGORIES } from '../src/constants/CONSTANTS';
 
 function NoteCard({ note, onDeleteNote, onEditNote }) {
     const [isEditing, setIsEditing] = useState(false);
@@ -50,9 +51,11 @@ function NoteCard({ note, onDeleteNote, onEditNote }) {
                         className="bg-gray-200 text-gray-800 text-xs font-semibold px-2 py-1 rounded"
                         onChange={(e) => onEditNote(note.id, { ...note, category: e.target.value })}
                     >
-                        <option value="personal">Personal</option>
-                        <option value="work">Work</option>
-                        <option value="other">Other</option>
+                        {CATEGORIES.map((category) => (
+                            <option key={category} value={category}>
+                                {category}
+                            </option>
+                        ))}
                     </select>
                 </div>
             ) : (

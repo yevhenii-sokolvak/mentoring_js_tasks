@@ -1,10 +1,19 @@
-function FilterPanel() {
+import { CATEGORIES } from '../src/constants/CONSTANTS';
+
+function FilterPanel({onFilter}) {
+
+
     return(
         <div>
-            <label className="inline-flex items-center gap-2">
-                Filter 1
-                <input type="checkbox" id="filter1" name="filter1" value="Filter 1" />
-            </label>
+            {CATEGORIES.map((category) => (
+                <label 
+                    className="inline-flex items-center gap-2 mr-4" 
+                    key={category.replace(/\s+/g, "_").toLowerCase()}
+                >
+                    {category}
+                    <input type="checkbox" name="category" value={category} onChange={() => onFilter(category)} />
+                </label>
+            ))}
         </div>
     )
 }
