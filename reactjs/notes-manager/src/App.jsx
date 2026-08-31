@@ -11,28 +11,45 @@ function App() {
       title: 'First Note',
       content: 'This is the content of the first note.',
       category: 'Personal',
+      createdAt: new Date().toISOString(),
     },
     {
       id: crypto.randomUUID(),
       title: 'Second Note',
       content: 'This is the content of the second note.',
       category: 'Work',
+      createdAt: new Date().toISOString(),
     },
   ]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState([]);
+  const [noteToEdit, setNoteToEdit] = useState(null);
 
   const handleAddNote = (newNote) => {
     setNotes((prevNotes) => [...prevNotes, newNote]);
   }
 
+  const handleEditNote = (note) => {
+    setNoteToEdit(note);
+  };
+
   const handleDeleteNote = (noteId) => {
     setNotes((prevNotes) => prevNotes.filter(note => note.id !== noteId));
   }
 
-  const handleEditNote = (noteId, updatedNote) => {
-    setNotes((prevNotes) => prevNotes.map(note => note.id === noteId ? updatedNote : note));
-  }
+  const handleUpdateNote = (updatedNote) => {
+      setNotes((prevNotes) =>
+          prevNotes.map((note) =>
+              note.id === updatedNote.id ? updatedNote : note
+          )
+      );
+
+      setNoteToEdit(null);
+  };
+
+  const handleCancelEdit = () => {
+      setNoteToEdit(null);
+  };
 
   const handleSearch = (searchTerm) => {
     setSearchTerm(searchTerm);
@@ -63,7 +80,15 @@ function App() {
   return (
     <div className="container mx-auto p-4">
       <Header onSearch={handleSearch} onFilter={handleFilter} />
-      <NotesManager notes={filteredNotes} onAddNote={handleAddNote} onDeleteNote={handleDeleteNote} onEditNote={handleEditNote} />
+      <NotesManager 
+        notes={filteredNotes}
+        noteToEdit={noteToEdit}
+        onAddNote={handleAddNote} 
+        onEditNote={handleEditNote} 
+        onDeleteNote={handleDeleteNote} 
+        onUpdateNote={handleUpdateNote} 
+        onCancelEdit={handleCancelEdit} 
+      />
     </div>
   )
 }
