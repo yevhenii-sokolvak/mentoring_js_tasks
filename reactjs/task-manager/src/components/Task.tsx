@@ -1,11 +1,10 @@
 import type TaskItem from '../types/types';
 
 interface TaskProps extends TaskItem {
-  id: string;
   onToggle: () => void;
 }
 
-function Task({ id = crypto.randomUUID(), title, description, isCompleted = false, onToggle }: TaskProps) {
+function Task({ id, title, description, isCompleted = false, onToggle }: TaskProps) {
   return (
     <div
       id={id}

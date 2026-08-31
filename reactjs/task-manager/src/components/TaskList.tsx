@@ -6,13 +6,9 @@ import FilterBar from './FilterBar';
 import type TaskItem from '../types/types';
 import type { FilterStatus } from '../types/types';
 
-interface TaskItemWithId extends TaskItem {
-  id: string;
-}
-
 const STORAGE_KEY = 'tasks';
 
-const defaultTasks: TaskItemWithId[] = [
+const defaultTasks: TaskItem[] = [
   {
     id: crypto.randomUUID(),
     title: 'Вивчити пропси',
@@ -33,7 +29,7 @@ const defaultTasks: TaskItemWithId[] = [
   },
 ];
 
-function loadTasksFromStorage(): TaskItemWithId[] {
+function loadTasksFromStorage(): TaskItem[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : defaultTasks;
@@ -43,7 +39,7 @@ function loadTasksFromStorage(): TaskItemWithId[] {
 }
 
 function TaskList() {
-  const [tasks, setTasks] = useState<TaskItemWithId[]>(loadTasksFromStorage());
+  const [tasks, setTasks] = useState<TaskItem[]>(loadTasksFromStorage);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
 
@@ -63,7 +59,7 @@ function TaskList() {
       });
   }, [tasks, searchQuery, filterStatus]);
 
-  const handleToggle = (taskToToggle: TaskItemWithId): void => {
+  const handleToggle = (taskToToggle: TaskItem): void => {
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
         task === taskToToggle ? { ...task, isCompleted: !task.isCompleted } : task
@@ -80,7 +76,6 @@ function TaskList() {
 
   const handleClearAll = (): void => {
     setTasks([]);
-    localStorage.removeItem(STORAGE_KEY);
   };
 
   return (
