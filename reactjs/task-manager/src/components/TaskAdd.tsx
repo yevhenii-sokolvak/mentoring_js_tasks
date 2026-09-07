@@ -1,40 +1,44 @@
-import { useState } from 'react'; 
+import { useState } from 'react';
 import type TaskItem from '../types/types';
+import { TaskCategory } from '../types/types';
 
 function TaskAdd({ onAddTask }: { onAddTask: (task: TaskItem) => void }) {
-    const [newTitle, setNewTitle] = useState('');
-    const [newDescription, setNewDescription] = useState('');
-    const [error, setError] = useState('');
+  const [newTitle, setNewTitle] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [newCategory, setNewCategory] = useState<TaskCategory>(TaskCategory.Work);
+  const [error, setError] = useState('');
 
-    const resetTaskAddForm = () => {
-      setNewTitle('');
-      setNewDescription('');
-      setError('');
-    };
+  const resetTaskAddForm = () => {
+    setNewTitle('');
+    setNewDescription('');
+    setNewCategory(TaskCategory.Work);
+    setError('');
+  };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-      if (!newTitle.trim()) {
-        setError('Назва задачі не може бути порожньою');
-        return;
-      }
+    if (!newTitle.trim()) {
+      setError('Назва задачі не може бути порожньою');
+      return;
+    }
 
-      onAddTask({
-          id: crypto.randomUUID(),
-          title: newTitle.trim(),
-          description: newDescription,
-          isCompleted: false,
-      });
+    onAddTask({
+      id: crypto.randomUUID(),
+      title: newTitle.trim(),
+      description: newDescription,
+      isCompleted: false,
+      category: newCategory,
+    });
 
-      resetTaskAddForm();
-    };
+    resetTaskAddForm();
+  };
 
-    return (
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-4 rounded-lg shadow-md border border-gray-200 mb-6 space-y-3"
-      >
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-4 rounded-lg shadow-md border border-gray-200 mb-6 space-y-3"
+    >
       <h2 className="text-lg font-semibold text-gray-800">Нова задача</h2>
 
       <input
@@ -56,6 +60,18 @@ function TaskAdd({ onAddTask }: { onAddTask: (task: TaskItem) => void }) {
         rows={2}
       />
 
+      <select
+        value={newCategory}
+        onChange={(e) => setNewCategory(e.target.value as TaskCategory)}
+        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        {Object.values(TaskCategory).map((category) => (
+          <option key={category} value={category}>
+            {category}
+          </option>
+        ))}
+      </select>
+
       {error && (
         <p className="text-sm text-red-600" role="alert">
           {error}
@@ -68,8 +84,8 @@ function TaskAdd({ onAddTask }: { onAddTask: (task: TaskItem) => void }) {
       >
         Додати задачу
       </button>
-      </form>
-    );
+    </form>
+  );
 }
 
 export default TaskAdd;

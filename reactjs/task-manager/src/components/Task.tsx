@@ -2,9 +2,18 @@ import type TaskItem from '../types/types';
 
 interface TaskProps extends TaskItem {
   onToggle: () => void;
+  onDelete: () => void;
 }
 
-function Task({ id, title, description, isCompleted = false, onToggle }: TaskProps) {
+function Task({
+  id,
+  title,
+  description,
+  isCompleted = false,
+  category,
+  onToggle,
+  onDelete,
+}: TaskProps) {
   return (
     <div
       id={id}
@@ -20,6 +29,11 @@ function Task({ id, title, description, isCompleted = false, onToggle }: TaskPro
         >
           {title}
         </h3>
+
+        <span className="text-xs px-2 py-1 rounded-full font-medium bg-blue-100 text-blue-800">
+          {category}
+        </span>
+
         <span
           className={`text-xs px-2 py-1 rounded-full font-medium ${
             isCompleted
@@ -29,12 +43,22 @@ function Task({ id, title, description, isCompleted = false, onToggle }: TaskPro
         >
           {isCompleted ? 'Виконано' : 'Активна'}
         </span>
+
         <input
           type="checkbox"
           checked={isCompleted}
           onChange={onToggle}
           className="w-4 h-4 accent-green-600 cursor-pointer"
         />
+
+        <button
+          type="button"
+          onClick={onDelete}
+          aria-label="Видалити задачу"
+          className="text-gray-400 hover:text-red-600 text-sm cursor-pointer"
+        >
+          ✕
+        </button>
       </div>
       <p className="text-gray-600 text-sm">{description}</p>
     </div>
