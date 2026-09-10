@@ -10,7 +10,6 @@ interface TaskItem {
     description: string;
     isCompleted: boolean;
     category: TaskCategory;
-    onToggle?: () => void;
 }
 
 export type FilterStatus = 'all' | 'active' | 'completed';

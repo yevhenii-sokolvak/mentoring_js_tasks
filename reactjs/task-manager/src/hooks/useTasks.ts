@@ -3,7 +3,7 @@ import type TaskItem from '../types/types';
 import type { FilterStatus } from '../types/types';
 import { TaskCategory } from '../types/types';
 
-const STORAGE_KEY = 'tasks';
+const STORAGE_KEY = 'tasks-v2';
 
 const defaultTasks: TaskItem[] = [
   {

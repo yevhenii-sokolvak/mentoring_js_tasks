@@ -15,11 +15,11 @@ function List<T>({ items, renderItem, keyExtractor, emptyMessage }: ListProps<T>
   }
 
   return (
-    <div className="space-y-3">
+    <ul>
       {items.map((item) => (
-        <div key={keyExtractor(item)}>{renderItem(item)}</div>
+        <li key={keyExtractor(item)}>{renderItem(item)}</li>
       ))}
-    </div>
+    </ul>
   );
 }
 

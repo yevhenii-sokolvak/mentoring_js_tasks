@@ -69,21 +69,23 @@ function TaskList() {
               <h2 className="text-md font-bold text-gray-700 mb-2">
                 {category} ({items.length})
               </h2>
-              <List<TaskItem>
-                items={items}
-                keyExtractor={(task) => task.id}
-                renderItem={(task) => (
-                  <Task
-                    id={task.id}
-                    title={task.title}
-                    description={task.description}
-                    isCompleted={task.isCompleted}
-                    category={task.category}
-                    onToggle={() => toggleTask(task.id)}
-                    onDelete={() => deleteTask(task.id)}
-                  />
-                )}
-              />
+              <div className="space-y-3">
+                <List<TaskItem>
+                  items={items}
+                  keyExtractor={(task) => task.id}
+                  renderItem={(task) => (
+                    <Task
+                      id={task.id}
+                      title={task.title}
+                      description={task.description}
+                      isCompleted={task.isCompleted}
+                      category={task.category}
+                      onToggle={() => toggleTask(task.id)}
+                      onDelete={() => deleteTask(task.id)}
+                    />
+                  )}
+                />
+              </div>
             </div>
           );
         })
