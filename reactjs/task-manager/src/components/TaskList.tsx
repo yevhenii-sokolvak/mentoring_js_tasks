@@ -4,7 +4,14 @@ import TaskAdd from './TaskAdd';
 import SearchBar from './SearchBar';
 import FilterBar from './FilterBar';
 import List from './List';
-import useTasks from '../hooks/useTasks';
+import {
+  useGetTasksQuery,
+  useAddTaskMutation,
+  useUpdateTaskMutation,
+  useDeleteTaskMutation,
+} from '../store/tasksApi';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { setSearchQuery, setFilter } from '../store/uiSlice';
 import type TaskItem from '../types/types';
 import { TaskCategory } from '../types/types';
 
@@ -23,73 +30,70 @@ function groupByCategory(tasks: TaskItem[]): Record<TaskCategory, TaskItem[]> {
 }
 
 function TaskList() {
-  const {
-    addTask,
-    toggleTask,
-    deleteTask,
-    clearAll,
-    filteredTasks,
-    searchQuery,
-    setSearchQuery,
-    filter,
-    setFilter,
-  } = useTasks();
+  const dispatch = useAppDispatch();
+  const searchQuery = useAppSelector((state) => state.ui.searchQuery);
+  const filter = useAppSelector((state) => state.ui.filter);
 
-  const groupedTasks = useMemo(
-    () => groupByCategory(filteredTasks),
-    [filteredTasks]
-  );
+  const { data: tasks = [], isLoading, isError } = useGetTasksQuery();
+  const [addTask] = useAddTaskMutation();
+  const [updateTask] = useUpdateTaskMutation();
+  const [deleteTask] = useDeleteTaskMutation();
+
+  const filteredTasks = useMemo(() => {
+    return tasks
+      .filter((task) =>
+        task.title.toLowerCase().includes(searchQuery.trim().toLowerCase())
+      )
+      .filter((task) => {
+        if (filter === 'active') return !task.isCompleted;
+        if (filter === 'completed') return task.isCompleted;
+        return true;
+      });
+  }, [tasks, searchQuery, filter]);
+
+  const groupedTasks = useMemo(() => groupByCategory(filteredTasks), [filteredTasks]);
 
   return (
     <div className="max-w-xl mx-auto mt-10 space-y-3 px-4">
-      <TaskAdd onAddTask={addTask} />
+      <TaskAdd onAddTask={(task) => addTask(task)} />
 
-      <button
-        type="button"
-        onClick={clearAll}
-        className="text-sm text-red-600 hover:text-red-800 font-medium mb-2 cursor-pointer"
-      >
-        Очистити всі
-      </button>
-
-      <SearchBar value={searchQuery} onChange={setSearchQuery} />
-      <FilterBar value={filter} onChange={setFilter} />
-
-      {filteredTasks.length === 0 ? (
-        <p className="text-center text-gray-400 text-sm py-6">
-          Нічого не знайдено
+      {isLoading && <p className="text-center text-blue-500 text-sm py-2">Завантаження...</p>}
+      {isError && (
+        <p className="text-center text-red-600 text-sm py-2" role="alert">
+          Не вдалося завантажити задачі
         </p>
-      ) : (
-        Object.values(TaskCategory).map((category) => {
-          const items = groupedTasks[category];
-          if (items.length === 0) return null;
-
-          return (
-            <div key={category} className="mb-6">
-              <h2 className="text-md font-bold text-gray-700 mb-2">
-                {category} ({items.length})
-              </h2>
-              <div className="space-y-3">
-                <List<TaskItem>
-                  items={items}
-                  keyExtractor={(task) => task.id}
-                  renderItem={(task) => (
-                    <Task
-                      id={task.id}
-                      title={task.title}
-                      description={task.description}
-                      isCompleted={task.isCompleted}
-                      category={task.category}
-                      onToggle={() => toggleTask(task.id)}
-                      onDelete={() => deleteTask(task.id)}
-                    />
-                  )}
-                />
-              </div>
-            </div>
-          );
-        })
       )}
+
+      <SearchBar value={searchQuery} onChange={(value) => dispatch(setSearchQuery(value))} />
+      <FilterBar value={filter} onChange={(value) => dispatch(setFilter(value))} />
+
+      {Object.values(TaskCategory).map((category) => {
+        const items = groupedTasks[category];
+        if (items.length === 0) return null;
+
+        return (
+          <div key={category} className="mb-6">
+            <h2 className="text-md font-bold text-gray-700 mb-2">
+              {category} ({items.length})
+            </h2>
+            <List<TaskItem>
+              items={items}
+              keyExtractor={(task) => task.id}
+              renderItem={(task) => (
+                <Task
+                  id={task.id}
+                  title={task.title}
+                  description={task.description}
+                  isCompleted={task.isCompleted}
+                  category={task.category}
+                  onToggle={() => updateTask({ ...task, isCompleted: !task.isCompleted })}
+                  onDelete={() => deleteTask(task.id)}
+                />
+              )}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }
